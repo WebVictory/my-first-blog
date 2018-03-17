@@ -1,0 +1,51 @@
+{% load i18n mezzanine_tags accounts_tags %}
+{% if request.user.is_authenticated %}
+    <div class="btn-group" style="margin-right: 5px;">
+        <button type="button" class="btn btn-info"><a href="{% url 'blog_post_new' %}" style="text-decoration: none; color: white;">Написать</a></button>
+  <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">
+ <span class="caret"></span>
+ <span class="sr-only">Меню с переключением</span>
+ </button>
+  <ul class="dropdown-menu" role="menu">
+    <li><a href="{% url 'blog_new' %}">Добавить журнал</a></li>
+
+  </ul>
+</div>
+
+
+
+
+    <div class="btn-group">
+{#  <a href="#" data-toggle="dropdown" class="dropdown-toggle" ><img class="img-responsive" src="{{ MEDIA_URL }}{% thumbnail 'uploads\gallery\Amsterdam, Holland.jpg' 36 36 left=.0 top=.0 %}"></a>#}
+  <a href="#" data-toggle="dropdown" class="dropdown-toggle" ><img class="mycss_avatar" src="{{ MEDIA_URL }}{% thumbnail request.user.myprofile.avatar 35 35 %} "></a>
+
+
+    <ul class="dropdown-menu">
+      <li><a href="{% url "profile" request.user.username %}">Профиль({{ request.user|username_or:"email" }})</a></li>
+      <li><a href="{% url "profile_update" %}">Обновить профиль</a></li>
+      <li class="divider"></li>
+      <li><a href="{% url "logout" %}">Выйти</a></li>
+   </ul>
+</div>
+{#    <p>#}
+{#    {% trans "Logged in as: " %}#}
+{#    {% url "profile" request.user.username as profile_url %}#}
+{#    {% if profile_url %}#}
+{#        <a href="{{ profile_url }}">{{ request.user|username_or:"email" }}</a>#}
+{#    </p>#}
+{#        <a href="{% url "profile_update" %}" class="btn btn-default btn-sm btn-account">#}
+{#            <span class="glyphicon glyphicon-edit"></span> {% trans "Update profile" %}</a>#}
+{#    {% else %}#}
+{#        <a href="{% url "profile_update" %}">{{ request.user|username_or:"email" }}</a>#}
+{#    </p>#}
+{#    {% endif %}#}
+{#    <a href="{% url "logout" %}?next={{ request.path }}" class="btn btn-sm btn-danger btn-account">#}
+{#        <span class="glyphicon glyphicon-log-out"></span> {% trans "Log out" %}</a>#}
+
+{% else %}
+    <a href="{% url "login" %}?next={{ request.path }}" class="btn btn-default btn-sm btn-account">
+        <span class="glyphicon glyphicon-log-in"></span> {% trans "Log in" %}</a>
+    &nbsp;{% trans "or" %}&nbsp;
+    <a href="{% url "signup" %}?next={{ request.path }}" class="btn btn-default btn-sm btn-account">
+        <span class="glyphicon glyphicon-edit"></span> {% trans "Sign up" %}</a>
+{% endif %}

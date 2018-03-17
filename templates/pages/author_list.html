@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% load i18n mezzanine_tags blog_tags keyword_tags disqus_tags %}
+
+{% block meta_title %}{% if page %}{{ page.meta_title }}{% else %}{% trans "Blog" %}{% endif %}{% endblock %}
+
+{% block meta_keywords %}{% metablock %}
+{% keywords_for page as keywords %}
+{% for keyword in keywords %}
+    {% if not forloop.first %}, {% endif %}
+    {{ keyword }}
+{% endfor %}
+{% endmetablock %}{% endblock %}
+
+{% block meta_description %}{% metablock %}
+{{ page.description }}
+{% endmetablock %}{% endblock %}
+
+{% block title %}
+{% if page %}
+{% editable page.title %}{{ page.title }}{% endeditable %}
+{% else %}
+{% trans "Blog" %}
+{% endif %}
+{% endblock %}
+
+{% block breadcrumb_menu %}
+{{ block.super }}
+{% if tag or category or year or month or author %}
+<li>{% spaceless %}
+{% if tag %}
+    {% trans "Tag:" %} {{ tag }}
+{% else %}{% if category %}
+    {% trans "Category:" %} {{ category }}
+{% else %}{% if year or month %}
+    {% if month %}{{ month }}, {% endif %}{{ year }}
+{% else %}{% if author %}
+    {% trans "Author:" %} {{ author.get_full_name|default:author.username }}
+{% endif %}{% endif %}{% endif %}{% endif %}
+{% endspaceless %}
+</li>
+{% endif %}
+{% endblock %}
+
+{% block main %}
+
+
+{% if tag or category or year or month or author %}
+    {% block blog_post_list_filterinfo %}
+    <p>
+    {% if tag %}
+        {% trans "Viewing posts tagged" %} {{ tag }}
+    {% else %}{% if category %}
+        {% trans "Viewing posts for the category" %} {{ category }}
+    {% else %}{% if year or month %}
+        {% trans "Viewing posts from" %} {% if month %}{{ month }}, {% endif %}
+        {{ year }}
+    {% else %}{% if author %}
+        {% trans "Viewing posts by" %}
+        {{ author.get_full_name|default:author.username }}
+    {% endif %}{% endif %}{% endif %}{% endif %}
+    {% endblock %}
+    </p>
+{% else %}
+    {% if page %}
+    {% block blog_post_list_pagecontent %}
+    {% if page.get_content_model.content %}
+        {% editable page.get_content_model.content %}
+        {{ page.get_content_model.content|richtext_filters|safe }}
+        {% endeditable %}
+    {% endif %}
+    {% endblock %}
+    {% endif %}
+{% endif %}
+
+{% for blog_post in blog_posts %}
+<div class="blog-list-detail">
+  <table border="0" width="100%" style="margin-bottom: 0px;" >
+   <tr>
+    <td width=150px;" rowspan="2" >
+    <a href="{% url "profile" blog_post.user.username %}"><img style="width: 200px" class="mycss_avatar" src="{{ MEDIA_URL }}{% thumbnail blog_post.avatar 150 150 %}"></a>
+    </td>
+    <td  style="padding-left: 10px;" >
+        <h3 style="margin-top: 0px;" ><a href="{% url "profile" blog_post.user.username %}">{{ blog_post.user.get_full_name }}</a></h3>{{ blog_post.bio }}</td>
+   </tr>
+   <tr>
+    <td style="padding-left: 10px;"><b>Публикатеся в журналах (всего {{ blog_post.myblog_set.all.count }}):</b>
+    {% for blog in blog_post.myblog_set.all|slice:":10" %}
+     <a href="{{ blog.get_absolute_url }}">{{ blog }}</a>
+    {% endfor %}</td>
+  </tr>
+ </table>
+</div>
+{% endfor %}
+
+{% pagination_for blog_posts %}
+{% endblock %}
+
+{% block right_panel %}
+{% include "blog/includes/filter_panel.html" %}
+{% endblock %}
